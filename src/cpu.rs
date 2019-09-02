@@ -171,7 +171,7 @@ impl CPUOperationAppliable for State {
 
     // 0xAnnn - Index is set to nnn
     fn load_index_byte(&mut self) {
-       index = get_u16();
+        index = get_u16();
     }
 
     // 0xBnnn - PC is set to V0 + nnn
@@ -186,20 +186,25 @@ impl CPUOperationAppliable for State {
         registers[self.get_vx()] = rng.gen::<u8>() & self.get_u8()
     }
 
-    fn draw(&mut self) {
-        unimplemented!()
-    }
+    fn draw(&mut self) {}
 
+    // 0xEx9E - skip if key is pressed
     fn skip_key(&mut self) {
-        unimplemented!()
+        if self.keypad[self.get_vx()] {
+            self.pc += 2
+        }
     }
 
+    // 0xExA1 - skip if key is not pressed
     fn skip_neq_key(&mut self) {
-        unimplemented!()
+        if !self.keypad[self.get_vx()] {
+            self.pc += 2
+        }
     }
 
+    // 0xFx07 - load delay into register vx
     fn load_reg_delay(&mut self) {
-        unimplemented!()
+        self.registers[self.get_vx()] = self.delay
     }
 
     fn load_reg_key(&mut self) {
