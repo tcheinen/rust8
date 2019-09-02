@@ -18,6 +18,7 @@ use crate::state::State;
 
 mod state;
 mod constants;
+mod cpu;
 
 fn main() {
     println!("Hello, world!");
