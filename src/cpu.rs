@@ -77,88 +77,110 @@ impl CPUOperationAppliable for State {
         pc = get_u16();
     }
 
+    // 0x3xkk - Skip next operation if register x is equal to kk
     fn skip_equal_byte(&mut self) {
         if registers[get_vx() == get_u8()] {
             pc += 2;
         }
     }
 
+    // 0x4xkk - Skip next operation if register x is not equal to kk
     fn skip_neq_byte(&mut self) {
         if registers[get_vx() != get_u8()] {
             pc += 2;
         }
     }
 
+    // 0x5xy0 - Skip next operation if register x is equal to register y
     fn skip_equal(&mut self) {
         if get_vx() == get_vy() {
             pc += 2;
         }
     }
 
+    // 0x6xkk - Load byte kk into register x
     fn load_byte(&mut self) {
         registers[get_vx()] = get_u8()
     }
 
+
+    // 0x7xkk - Add byte kk to register x
     fn add_byte(&mut self) {
         registers(get_vx()) += get_u8();
     }
 
+    // 0x8xy0 - Load register y into register x
     fn load(&mut self) {
         registers[get_vx()] = registers[get_vy()]
     }
 
+
+    // 0x8xy1 - Set register x to bitwise or with register y
     fn or(&mut self) {
         registers[get_vx()] |= registers[get_vy()]
     }
 
+    // 0x8xy2 - Set register x to bitwise and with register y
     fn and(&mut self) {
         registers[get_vx()] &= registers[get_vy()]
     }
 
+    // 0x8xy3 - Set register x to bitwise xor with register y
     fn xor(&mut self) {
         registers[get_vx()] ^= registers[get_vy()]
     }
 
+    // 0x8xy4 - Add register y to register x, set register F to 1 if carry
     fn add(&mut self) {
         let sum: u16 = registers[get_vx()] + registers[get_vy()];
         registers[0xf] = if sum > 255 { 1 } else { 0 };
         registers[get_vx()] = sum & 0xff
     }
 
+    // 0x8xy5 - Subtract register y from register x, set register F to 1 if register x > register y
     fn sub(&mut self) {
         registers[0xf] = if get_vx() > get_vy() { 1 } else { 0 };
         registers[get_vx()] -= registers[get_vy()]
     }
 
+    // 0x8xy6 - Set register f to lsb and shift register x right 1
     fn shr(&mut self) {
         registers[0xf] = registers[get_vx()] & 0x1;
         registers[get_vx()] >>= 1;
     }
 
+    // 0x8xy7 - subtract Vx from Vy and store in Vx, if Vy > Vx then Vf = 1
     fn subn(&mut self) {
-        registers[0xf] = if get_vy() > get_vx() { 1 } else { 0 };
+        registers[0xf] = if registers[get_vy()] > registers[get_vx()] { 1 } else { 0 };
         registers[get_vx()] = registers[get_vy()] - registers[get_vx()]
     }
 
+    // 0x8xy8 - Set register f to msb and shift register x left 1
     fn shl(&mut self) {
         registers[0xf] = (registers[get_vx()] & 0x80) >> 7;
         registers[get_vx()] <<= 1;
     }
 
+
+    // 0x9xy0 - Skip next operation if Vx != Vy
     fn skip_neq(&mut self) {
         if registers[get_vx()] != registers[get_vy()] {
             pc += 2;
         }
     }
 
+    // 0xAnnn - Index is set to nnn
     fn load_index_byte(&mut self) {
        index = get_u16();
     }
 
+    // 0xBnnn - PC is set to V0 + nnn
     fn jump_r0_byte(&mut self) {
         pc = registers[0x0] + get_u16();
     }
 
+
+    // 0xCxkk - Generate random byte, AND with kk, and then store in Vx
     fn rand(&mut self) {
         let mut rng = rand::thread_rng();
         registers[self.get_vx()] = rng.gen::<u8>() & self.get_u8()
