@@ -45,55 +45,55 @@ impl State {
         match instruction >> 12 {
             0x0 => {
                 match nn {
-                    0xE0 => { self.clear() }
+                    0xE0 => { self.cls() }
                     0xEE => { self.ret() }
                     _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", instruction, self.pc) }
                 }
             }
-            0x1 => { self.jump() }
-            0x2 => { self.call() }
-            0x3 => { self.skip_equal_byte() }
-            0x4 => { self.skip_neq_byte() }
-            0x5 => { self.skip_equal() }
-            0x6 => { self.load_byte() }
-            0x7 => { self.add_byte() }
+            0x1 => { self.jp_addr() }
+            0x2 => { self.call_addr() }
+            0x3 => { self.se_vx_byte() }
+            0x4 => { self.sne_vx_byte() }
+            0x5 => { self.se_vx_vy() }
+            0x6 => { self.ld_vx_byte() }
+            0x7 => { self.add_vx_byte() }
             0x8 => {
                 match n {
-                    0x0 => { self.load() }
-                    0x1 => { self.or() }
-                    0x2 => { self.and() }
-                    0x3 => { self.xor() }
-                    0x4 => { self.add() }
-                    0x5 => { self.sub() }
-                    0x6 => { self.shr() }
-                    0x7 => { self.subn() }
-                    0x8 => { self.shl() }
+                    0x0 => { self.ld_vx_vy() }
+                    0x1 => { self.or_vx_vy() }
+                    0x2 => { self.and_vx_vy() }
+                    0x3 => { self.xor_vx_vy() }
+                    0x4 => { self.add_vx_vy() }
+                    0x5 => { self.sub_vx_vy() }
+                    0x6 => { self.shr_vx_vy() }
+                    0x7 => { self.subn_vx_vy() }
+                    0x8 => { self.shl_vx_vy() }
                     _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", instruction, self.pc) }
                 }
             }
-            0x9 => { self.skip_neq() }
-            0xA => { self.load_index_byte() }
-            0xB => { self.jump_r0_byte() }
-            0xC => { self.rand() }
-            0xD => { self.draw() }
+            0x9 => { self.sne_vx_vy() }
+            0xA => { self.ld_i_addr() }
+            0xB => { self.jp_v0_addr() }
+            0xC => { self.rnd_vx_byte() }
+            0xD => { self.drw_vx_vy_nibble() }
             0xE => {
                 match nn {
-                    0x9e => { self.skip_key() }
-                    0xA1 => { self.skip_neq_key() }
+                    0x9e => { self.skp_vx() }
+                    0xA1 => { self.sknp_vx() }
                     _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", instruction, self.pc) }
                 }
             }
             0xF => {
                 match nn {
-                    0x07 => { self.load_reg_delay() }
-                    0x0A => { self.load_reg_key() }
-                    0x15 => { self.load_delay_reg() }
-                    0x18 => { self.load_sound_reg() }
-                    0x1E => { self.add_i_reg() }
-                    0x29 => { self.load_sprite() }
-                    0x33 => { self.load_bcd() }
-                    0x55 => { self.load_mem_registers() }
-                    0x65 => { self.load_registers_mem() }
+                    0x07 => { self.ld_vx_dt() }
+                    0x0A => { self.ld_vx_k() }
+                    0x15 => { self.ld_dt_vx() }
+                    0x18 => { self.ld_st_vx() }
+                    0x1E => { self.add_i_vx() }
+                    0x29 => { self.ld_f_vx() }
+                    0x33 => { self.ld_b_vx() }
+                    0x55 => { self.ld_mem_vx() }
+                    0x65 => { self.ld_vx_mem() }
                     _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", instruction, self.pc) }
                 }
             }
