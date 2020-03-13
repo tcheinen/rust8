@@ -1,5 +1,5 @@
 [package]
-name = "rust8"
+name = "rust8-core"
 version = "0.1.0"
 authors = ["Teddy Heinen <skyshayde@gmail.com>"]
 edition = "2018"

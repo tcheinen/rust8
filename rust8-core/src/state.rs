@@ -103,20 +103,13 @@ impl State {
         }
     }
 
-    // Read u16 from memory and increment PC twice
-    pub fn read_cycle(&mut self) -> u16 {
-        let opcode: u16 = self.memory[self.pc as usize] as u16 | self.memory[(self.pc + 1) as usize] as u16;
-        self.pc += 2;
-        return opcode
-    }
-
-    // return short value for an operation
-    pub fn get_u16(&self) -> u16 {
+    // return lower 12 bits of an opcode
+    pub fn get_nnn(&self) -> u16 {
         self.opcode & 0x0FFF
     }
 
-    // return byte value for an operation
-    pub fn get_u8(&self) -> u8 {
+    /// return lower byte of opcode
+    pub fn get_nn(&self) -> u8 {
         (self.opcode & 0xFF) as u8
     }
 
@@ -125,13 +118,13 @@ impl State {
         (self.opcode & 0x000F) as u8
     }
 
-    // return left register for an operation
-    pub fn get_vx(&self) -> u8 {
+    /// return second most significant 4 bits 0x00
+    pub fn get_x(&self) -> u8 {
         ((self.opcode & 0x0F00) >> 8) as u8
     }
 
-    // return right register for an operation
-    pub fn get_vy(&self) -> u8 {
+    /// return third most significant 4 bits 00y0
+    pub fn get_y(&self) -> u8 {
         ((self.opcode & 0x00F0) >> 4) as u8
     }
 }
