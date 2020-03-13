@@ -12,8 +12,12 @@ impl Keyboard {
         self.receiver.recv().unwrap()
     }
 
-    pub fn press_key(&self, key: u8) {
+    pub fn press_key(&mut self, key: u8) {
         self.sender.send(key);
+        self.keypad[key as usize] = true;
+    }
+    pub fn release_key(&mut self, key: u8) {
+        self.keypad[key as usize] = false;
     }
 }
 

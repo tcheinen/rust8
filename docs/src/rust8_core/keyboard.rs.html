@@ -27,6 +27,10 @@
 <span id="27">27</span>
 <span id="28">28</span>
 <span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>::{<span class="ident">Sender</span>, <span class="ident">Receiver</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>;
@@ -42,8 +46,12 @@
         <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">press_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">u8</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">press_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">u8</span>) {
         <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">key</span>);
+        <span class="self">self</span>.<span class="ident">keypad</span>[<span class="ident">key</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="bool-val">true</span>;
+    }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">release_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">u8</span>) {
+        <span class="self">self</span>.<span class="ident">keypad</span>[<span class="ident">key</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="bool-val">false</span>;
     }
 }
 

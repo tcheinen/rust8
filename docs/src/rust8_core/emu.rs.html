@@ -157,7 +157,6 @@
 <span id="157">157</span>
 <span id="158">158</span>
 <span id="159">159</span>
-<span id="160">160</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2019 Teddy Heinen</span>
 <span class="comment">//</span>
@@ -177,6 +176,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cpu</span>::<span class="ident">cpu</span>::{<span class="ident">CPU</span>, <span class="ident">mnemonic</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">keyboard</span>::<span class="ident">Keyboard</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">display</span>::<span class="ident">Display</span>;
 
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Emulator</span> {
@@ -188,8 +188,7 @@
     <span class="kw">pub</span> <span class="ident">stack</span>: [<span class="ident">u16</span>; <span class="number">16</span>],
     <span class="kw">pub</span> <span class="ident">delay</span>: <span class="ident">u8</span>,
     <span class="kw">pub</span> <span class="ident">sound</span>: <span class="ident">u8</span>,
-    <span class="kw">pub</span> <span class="ident">vram</span>: [<span class="ident">bool</span>; <span class="number">64</span> <span class="op">*</span> <span class="number">32</span>],
-    <span class="kw">pub</span> <span class="ident">vram_dirty</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">display</span>: <span class="ident">Display</span>,
     <span class="kw">pub</span> <span class="ident">instruction</span>: <span class="ident">u16</span>,
     <span class="kw">pub</span> <span class="ident">keyboard</span>: <span class="ident">Keyboard</span>,
 }
@@ -308,8 +307,7 @@
             <span class="ident">stack</span>: [<span class="number">0x0</span>; <span class="number">16</span>],
             <span class="ident">delay</span>: <span class="number">0</span>,
             <span class="ident">sound</span>: <span class="number">0</span>,
-            <span class="ident">vram</span>: [<span class="bool-val">false</span>; <span class="number">64</span> <span class="op">*</span> <span class="number">32</span>],
-            <span class="ident">vram_dirty</span>: <span class="bool-val">false</span>,
+            <span class="ident">display</span>: <span class="ident">Display</span>::<span class="ident">default</span>(),
             <span class="ident">instruction</span>: <span class="number">0</span>,
             <span class="ident">keyboard</span>: <span class="ident">Keyboard</span>::<span class="ident">default</span>(),
         };

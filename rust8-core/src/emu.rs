@@ -16,6 +16,7 @@
 use crate::constants;
 use crate::cpu::cpu::{CPU, mnemonic};
 use crate::keyboard::Keyboard;
+use crate::display::Display;
 
 
 pub struct Emulator {
@@ -27,8 +28,7 @@ pub struct Emulator {
     pub stack: [u16; 16],
     pub delay: u8,
     pub sound: u8,
-    pub vram: [bool; 64 * 32],
-    pub vram_dirty: bool,
+    pub display: Display,
     pub instruction: u16,
     pub keyboard: Keyboard,
 }
@@ -147,8 +147,7 @@ impl Default for Emulator {
             stack: [0x0; 16],
             delay: 0,
             sound: 0,
-            vram: [false; 64 * 32],
-            vram_dirty: false,
+            display: Display::default(),
             instruction: 0,
             keyboard: Keyboard::default(),
         };

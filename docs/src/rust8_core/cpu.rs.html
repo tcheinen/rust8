@@ -374,6 +374,7 @@
 <span id="374">374</span>
 <span id="375">375</span>
 <span id="376">376</span>
+<span id="377">377</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2019 Teddy Heinen</span>
 <span class="comment">//</span>
@@ -434,7 +435,8 @@
     <span class="kw">impl</span> <span class="ident">CPU</span> <span class="kw">for</span> <span class="ident">Emulator</span> {
         <span class="doccomment">/// 0x00E0 - Clear the display</span>
         <span class="kw">fn</span> <span class="ident">cls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-            <span class="self">self</span>.<span class="ident">vram</span> <span class="op">=</span> [<span class="bool-val">false</span>; <span class="number">64</span> <span class="op">*</span> <span class="number">32</span>];
+            <span class="self">self</span>.<span class="ident">display</span>.<span class="ident">vram</span> <span class="op">=</span> [<span class="bool-val">false</span>; <span class="number">64</span> <span class="op">*</span> <span class="number">32</span>];
+            <span class="self">self</span>.<span class="ident">display</span>.<span class="ident">update_display</span>();
             <span class="self">self</span>.<span class="ident">pc</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
         }
 
@@ -594,11 +596,11 @@
                 <span class="kw">for</span> <span class="ident">bit</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">8u8</span> {
                     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">registers</span>[<span class="self">self</span>.<span class="ident">get_x</span>() <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">+</span> <span class="ident">bit</span>) <span class="op">%</span> <span class="ident">DISPLAY_WIDTH</span>;
                     <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">memory</span>[<span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">byte</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">7</span> <span class="op">-</span> <span class="ident">bit</span>)) <span class="op">&amp;</span> <span class="number">1</span>;
-                    <span class="self">self</span>.<span class="ident">registers</span>[<span class="number">0xf</span>] <span class="op">|</span><span class="op">=</span> <span class="ident">value</span> <span class="op">&amp;</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">vram</span>[<span class="ident">y</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">DISPLAY_WIDTH</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>] { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> };
-                    <span class="self">self</span>.<span class="ident">vram</span>[<span class="ident">y</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">DISPLAY_WIDTH</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">value</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+                    <span class="self">self</span>.<span class="ident">registers</span>[<span class="number">0xf</span>] <span class="op">|</span><span class="op">=</span> <span class="ident">value</span> <span class="op">&amp;</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display</span>.<span class="ident">vram</span>[<span class="ident">y</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">DISPLAY_WIDTH</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>] { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> };
+                    <span class="self">self</span>.<span class="ident">display</span>.<span class="ident">vram</span>[<span class="ident">y</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">DISPLAY_WIDTH</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">value</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
                 }
             }
-            <span class="self">self</span>.<span class="ident">vram_dirty</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="self">self</span>.<span class="ident">display</span>.<span class="ident">update_display</span>();
             <span class="self">self</span>.<span class="ident">pc</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
         }
 

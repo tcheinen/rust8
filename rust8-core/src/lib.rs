@@ -17,3 +17,4 @@ pub mod emu;
 pub mod constants;
 mod cpu;
 mod keyboard;
+mod display;

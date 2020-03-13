@@ -57,7 +57,8 @@ pub mod cpu {
     impl CPU for Emulator {
         /// 0x00E0 - Clear the display
         fn cls(&mut self) {
-            self.vram = [false; 64 * 32];
+            self.display.vram = [false; 64 * 32];
+            self.display.update_display();
             self.pc += 2;
         }
 
@@ -205,6 +206,7 @@ pub mod cpu {
             self.registers[self.get_x() as usize] = rand::random::<u8>() & self.get_nn();
             self.pc += 2;
         }
+
         /// 0XDxyn - Display n length sprite at memory location I at (Vx, Vy)
         /// VF is set if there is a collision
         fn drw_vx_vy_nibble(&mut self) {
@@ -216,11 +218,11 @@ pub mod cpu {
                 for bit in 0..8u8 {
                     let x = (self.registers[self.get_x() as usize] + bit) % DISPLAY_WIDTH;
                     let value = (self.memory[self.index as usize + byte as usize] >> (7 - bit)) & 1;
-                    self.registers[0xf] |= value & if self.vram[y as usize * DISPLAY_WIDTH as usize + x as usize] { 1 } else { 0 };
-                    self.vram[y as usize * DISPLAY_WIDTH as usize + x as usize] ^= value != 0;
+                    self.registers[0xf] |= value & if self.display.vram[y as usize * DISPLAY_WIDTH as usize + x as usize] { 1 } else { 0 };
+                    self.display.vram[y as usize * DISPLAY_WIDTH as usize + x as usize] ^= value != 0;
                 }
             }
-            self.vram_dirty = true;
+            self.display.update_display();
             self.pc += 2;
         }
 
