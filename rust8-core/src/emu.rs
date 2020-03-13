@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::constants;
-use crate::cpu::cpu::CPU;
+use crate::cpu::cpu::{CPU, mnemonic};
 use crate::keyboard::Keyboard;
 
 
@@ -30,7 +30,7 @@ pub struct Emulator {
     pub vram: [bool; 64 * 32],
     pub vram_dirty: bool,
     pub opcode: u16,
-    pub keyboard: Keyboard
+    pub keyboard: Keyboard,
 }
 
 impl Emulator {
@@ -44,6 +44,7 @@ impl Emulator {
         let n: u8 = (instruction & 0x000f) as u8;
         let nn: u8 = (instruction & 0x00ff) as u8;
 
+        println!("{:#x} - {}", instruction, mnemonic(instruction));
         match instruction >> 12 {
             0x0 => {
                 match nn {
@@ -151,7 +152,7 @@ impl Default for Emulator {
             vram: [false; 64 * 32],
             vram_dirty: false,
             opcode: 0,
-            keyboard: Keyboard::default()
+            keyboard: Keyboard::default(),
         };
         for i in 0..constants::FONTSET.len() {
             state.memory[constants::FONTSET_START as usize + i] = constants::FONTSET[i];
