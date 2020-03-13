@@ -52,6 +52,7 @@ pub mod cpu {
         fn ld_b_vx(&mut self);
         fn ld_mem_vx(&mut self);
         fn ld_vx_mem(&mut self);
+        fn mnemonic(instruction: u16) -> String;
     }
 
     impl CPU for Emulator {
@@ -302,6 +303,65 @@ pub mod cpu {
             }
             self.index += self.get_x() as u16 + 1;
             self.pc += 2;
+        }
+        fn mnemonic(instruction: u16) -> String {
+            return match instruction >> 12 {
+                0x0 => {
+                    match nn {
+                        0xE0 => { "CLS" }
+                        0xEE => { "RET" }
+                        _ => { "INVALID" }
+                    }
+                }
+                0x1 => { "JP addr" }
+                0x2 => { "CALL addr" }
+                0x3 => { "SE Vx, byte" }
+                0x4 => { "SNE Vx, byte" }
+                0x5 => { "SE Vx, Vy" }
+                0x6 => { "LD Vx, byte" }
+                0x7 => { "ADD Vx, byte" }
+                0x8 => {
+                    match n {
+                        0x0 => { "LD Vx, Vy" }
+                        0x1 => { "OR Vx, Vy" }
+                        0x2 => { "AND Vx, Vy" }
+                        0x3 => { "XOR Vx, Vy" }
+                        0x4 => { "ADD Vx, Vy" }
+                        0x5 => { "SUB Vx, Vy" }
+                        0x6 => { "SHR Vx, Vy" }
+                        0x7 => { "SUBN Vx, Vy" }
+                        0x8 => { "SHL Vx, Vy" }
+                        _ => { "INVALID" }
+                    }
+                }
+                0x9 => { "SNE Vx, Vy" }
+                0xA => { "LD I, addr" }
+                0xB => { "JP V0, addr" }
+                0xC => { "RND Vx, byte" }
+                0xD => { "DRW Vx, Vy, n" }
+                0xE => {
+                    match nn {
+                        0x9e => { "SKP Vx" }
+                        0xA1 => { "SKNP Vx" }
+                        _ => { "INVALID" }
+                    }
+                }
+                0xF => {
+                    match nn {
+                        0x07 => { "LD Vx, DT" }
+                        0x0A => { "LD Vx, K" }
+                        0x15 => { "LD DT, Vx" }
+                        0x18 => { "LD ST, Vx" }
+                        0x1E => { "ADD I, Vx" }
+                        0x29 => { "LD F, Vx" }
+                        0x33 => { "LD B, Vx" }
+                        0x55 => { "LD [I], Vx" }
+                        0x65 => { "LD Vx, [I]" }
+                        _ => { "INVALID" }
+                    }
+                }
+                _ => { "INVALID" }
+            }.to_string()
         }
     }
 }
