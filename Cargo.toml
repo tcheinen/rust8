@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "rust8-core",
+    "rust8-minifb"
+]
