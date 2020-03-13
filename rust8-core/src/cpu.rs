@@ -216,8 +216,8 @@ pub mod cpu {
                 for bit in 0..8u8 {
                     let x = (self.registers[self.get_x() as usize] + bit) % DISPLAY_WIDTH;
                     let value = (self.memory[self.index as usize + byte as usize] >> (7 - bit)) & 1;
-                    self.registers[0xf] |= value & self.memory[y as usize * DISPLAY_HEIGHT as usize + x as usize];
-                    self.vram[y as usize * DISPLAY_HEIGHT as usize + x as usize] ^= value != 0;
+                    self.registers[0xf] |= value & if self.vram[y as usize * DISPLAY_WIDTH as usize + x as usize] { 1 } else { 0 };
+                    self.vram[y as usize * DISPLAY_WIDTH as usize + x as usize] ^= value != 0;
                 }
             }
             self.vram_dirty = true;
@@ -307,64 +307,69 @@ pub mod cpu {
     }
 
     pub fn mnemonic(instruction: u16) -> String {
+        let x = ((instruction & 0x0F00) >> 8) as u8;
+        let y = ((instruction & 0x00F0) >> 4) as u8;
+
         let n: u8 = (instruction & 0x000f) as u8;
         let nn: u8 = (instruction & 0x00ff) as u8;
+        let nnn = instruction & 0x0FFF;
+
         return match instruction >> 12 {
             0x0 => {
                 match nn {
-                    0xE0 => { "CLS" }
-                    0xEE => { "RET" }
-                    _ => { "INVALID" }
+                    0xE0 => { format!("CLS") }
+                    0xEE => { format!("RET") }
+                    _ => { format!("INVALID") }
                 }
             }
-            0x1 => { "JP addr" }
-            0x2 => { "CALL addr" }
-            0x3 => { "SE Vx, byte" }
-            0x4 => { "SNE Vx, byte" }
-            0x5 => { "SE Vx, Vy" }
-            0x6 => { "LD Vx, byte" }
-            0x7 => { "ADD Vx, byte" }
+            0x1 => { format!("JP {:#x}", nnn) }
+            0x2 => { format!("CALL {:#x}", nnn) }
+            0x3 => { format!("SE {:#x}, {:#x}", x, nn) }
+            0x4 => { format!("SNE {:#x}, {:#x}", x, nn) }
+            0x5 => { format!("SE Vx, Vy") }
+            0x6 => { format!("LD {:#x}, {:#x}", x, nn) }
+            0x7 => { format!("ADD {:#x}, {:#x}", x, nn) }
             0x8 => {
                 match n {
-                    0x0 => { "LD Vx, Vy" }
-                    0x1 => { "OR Vx, Vy" }
-                    0x2 => { "AND Vx, Vy" }
-                    0x3 => { "XOR Vx, Vy" }
-                    0x4 => { "ADD Vx, Vy" }
-                    0x5 => { "SUB Vx, Vy" }
-                    0x6 => { "SHR Vx, Vy" }
-                    0x7 => { "SUBN Vx, Vy" }
-                    0x8 => { "SHL Vx, Vy" }
-                    _ => { "INVALID" }
+                    0x0 => { format!("LD {:#x}, {:#x}", x, y) }
+                    0x1 => { format!("OR {:#x}, {:#x}", x, y) }
+                    0x2 => { format!("AND {:#x}, {:#x}", x, y) }
+                    0x3 => { format!("XOR {:#x}, {:#x}", x, y) }
+                    0x4 => { format!("ADD {:#x}, {:#x}", x, y) }
+                    0x5 => { format!("SUB {:#x}, {:#x}", x, y) }
+                    0x6 => { format!("SHR {:#x}, {:#x}", x, y) }
+                    0x7 => { format!("SUBN {:#x}, {:#x}", x, y) }
+                    0x8 => { format!("SHL {:#x}, {:#x}", x, y) }
+                    _ => { format!("INVALID") }
                 }
             }
-            0x9 => { "SNE Vx, Vy" }
-            0xA => { "LD I, addr" }
-            0xB => { "JP V0, addr" }
-            0xC => { "RND Vx, byte" }
-            0xD => { "DRW Vx, Vy, n" }
+            0x9 => { format!("SNE {:#x}, {:#x}", x, y) }
+            0xA => { format!("LD I, {:#x}", nnn) }
+            0xB => { format!("JP V0, {:#x}", nnn) }
+            0xC => { format!("RND {:#x}, {:#x}", x, nn) }
+            0xD => { format!("DRW {:#x}, {:#x}, {:#x}", x, y, n) }
             0xE => {
                 match nn {
-                    0x9e => { "SKP Vx" }
-                    0xA1 => { "SKNP Vx" }
-                    _ => { "INVALID" }
+                    0x9e => { format!("SKP {:#x}", x) }
+                    0xA1 => { format!("SKNP {:#x}", x) }
+                    _ => { format!("INVALID") }
                 }
             }
             0xF => {
                 match nn {
-                    0x07 => { "LD Vx, DT" }
-                    0x0A => { "LD Vx, K" }
-                    0x15 => { "LD DT, Vx" }
-                    0x18 => { "LD ST, Vx" }
-                    0x1E => { "ADD I, Vx" }
-                    0x29 => { "LD F, Vx" }
-                    0x33 => { "LD B, Vx" }
-                    0x55 => { "LD [I], Vx" }
-                    0x65 => { "LD Vx, [I]" }
-                    _ => { "INVALID" }
+                    0x07 => { format!("LD {:#x}, DT", x) }
+                    0x0A => { format!("LD {:#x}, K", x) }
+                    0x15 => { format!("LD DT, {:#x}", x) }
+                    0x18 => { format!("LD ST, {:#x}", x) }
+                    0x1E => { format!("ADD I, {:#x}", x) }
+                    0x29 => { format!("LD F, {:#x}", x) }
+                    0x33 => { format!("LD B, {:#x}", x) }
+                    0x55 => { format!("LD [I], {:#x}", x) }
+                    0x65 => { format!("LD {:#x}, [I]", x) }
+                    _ => { format!("INVALID") }
                 }
             }
-            _ => { "INVALID" }
-        }.to_string();
+            _ => { format!("INVALID") }
+        };
     }
 }

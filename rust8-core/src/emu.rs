@@ -105,9 +105,7 @@ impl Emulator {
     }
 
     // return lower 12 bits of an opcode
-    pub fn get_nnn(&self) -> u16 {
-        self.instruction & 0x0FFF
-    }
+    pub fn get_nnn(&self) -> u16 { self.instruction & 0x0FFF }
 
     /// return lower byte of opcode
     pub fn get_nn(&self) -> u8 {

@@ -28,7 +28,7 @@ fn main() {
                 }
             }
             window.update_with_buffer(&framebuf, width, height);
-
+            emu.vram_dirty = false;
         }
     }
 }
