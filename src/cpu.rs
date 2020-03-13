@@ -212,7 +212,7 @@ pub mod cpu {
 
         // 0xEx9E - skip if key is pressed
         fn skp_vx(&mut self) {
-            if self.keypad[self.get_vx() as usize] {
+            if self.keyboard.keypad[self.get_vx() as usize] {
                 self.pc += 2
             }
             self.pc += 2;
@@ -220,7 +220,7 @@ pub mod cpu {
 
         // 0xExA1 - skip if key is not pressed
         fn sknp_vx(&mut self) {
-            if !self.keypad[self.get_vx() as usize] {
+            if !self.keyboard.keypad[self.get_vx() as usize] {
                 self.pc += 2
             }
             self.pc += 2;
@@ -232,8 +232,9 @@ pub mod cpu {
             self.pc += 2;
         }
 
+        /// 0xFx0A - wait for keypress and store value in Vx
         fn ld_vx_k(&mut self) {
-            unimplemented!();
+            self.registers[self.get_vx() as usize] = self.keyboard.wait_for_keypress();
             self.pc += 2;
         }
 

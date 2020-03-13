@@ -14,13 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::state::State;
-
 mod state;
 mod constants;
 mod cpu;
-
-fn main() {
-    println!("Hello, world!");
-    let a: State = State { ..Default::default() };
-}
+mod keyboard;

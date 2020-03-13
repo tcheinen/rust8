@@ -16,6 +16,8 @@
 
 use crate::constants;
 use crate::cpu::cpu::CPU;
+use crate::keyboard::Keyboard;
+
 
 pub struct State {
     pub registers: [u8; 16],
@@ -26,9 +28,9 @@ pub struct State {
     pub stack: [u16; 16],
     pub delay: u8,
     pub sound: u8,
-    pub keypad: [bool; 16],
     pub vram: [bool; 64 * 32],
     pub opcode: u16,
+    pub keyboard: Keyboard
 }
 
 impl State {
@@ -140,9 +142,9 @@ impl Default for State {
             stack: [0x0; 16],
             delay: 0,
             sound: 0,
-            keypad: [false; 16],
             vram: [false; 64 * 32],
             opcode: 0,
+            keyboard: Keyboard::default()
         };
         for i in 0..constants::FONTSET.len() {
             state.memory[constants::FONTSET_START + i] = constants::FONTSET[i];
