@@ -57,8 +57,10 @@ pub mod cpu {
     impl CPU for State {
         // 0x00E0 - Clear the display
         fn cls(&mut self) {
-            self.vram = [false; 64 * 32]
+            self.vram = [false; 64 * 32];
+            self.pc += 2;
         }
+
 
         // 0x00EE - Return from a function
         fn ret(&mut self) {
@@ -83,6 +85,7 @@ pub mod cpu {
             if self.registers[self.get_vx() as usize] == self.get_u8() {
                 self.pc += 2;
             }
+            self.pc += 2;
         }
 
         // 0x4xkk - Skip next operation if register x is not equal to kk
@@ -90,6 +93,7 @@ pub mod cpu {
             if self.registers[self.get_vx() as usize] != self.get_u8() {
                 self.pc += 2;
             }
+            self.pc += 2;
         }
 
         // 0x5xy0 - Skip next operation if register x is equal to register y
@@ -97,69 +101,81 @@ pub mod cpu {
             if self.registers[self.get_vx() as usize] == self.registers[self.get_vy() as usize] {
                 self.pc += 2;
             }
+            self.pc += 2;
         }
 
         // 0x6xkk - Load byte kk into register x
         fn ld_vx_byte(&mut self) {
-            self.registers[self.get_vx() as usize] = self.get_u8()
+            self.registers[self.get_vx() as usize] = self.get_u8();
+            self.pc += 2;
         }
 
 
         // 0x7xkk - Add byte kk to register x
         fn add_vx_byte(&mut self) {
             self.registers[self.get_vx() as usize] += self.get_u8();
+            self.pc += 2;
         }
 
         // 0x8xy0 - Load register y into register x
         fn ld_vx_vy(&mut self) {
-            self.registers[self.get_vx() as usize] = self.registers[self.get_vy() as usize]
+            self.registers[self.get_vx() as usize] = self.registers[self.get_vy() as usize];
+            self.pc += 2;
         }
 
 
         // 0x8xy1 - Set register x to bitwise or with register y
         fn or_vx_vy(&mut self) {
-            self.registers[self.get_vx() as usize] |= self.registers[self.get_vy() as usize]
+            self.registers[self.get_vx() as usize] |= self.registers[self.get_vy() as usize];
+            self.pc += 2;
         }
 
         // 0x8xy2 - Set register x to bitwise and with register y
         fn and_vx_vy(&mut self) {
-            self.registers[self.get_vx() as usize] &= self.registers[self.get_vy() as usize]
+            self.registers[self.get_vx() as usize] &= self.registers[self.get_vy() as usize];
+            self.pc += 2;
         }
 
         // 0x8xy3 - Set register x to bitwise xor with register y
         fn xor_vx_vy(&mut self) {
-            self.registers[self.get_vx() as usize] ^= self.registers[self.get_vy() as usize]
+            self.registers[self.get_vx() as usize] ^= self.registers[self.get_vy() as usize];
+            self.pc += 2;
         }
 
         // 0x8xy4 - Add register y to register x, set register F to 1 if carry
         fn add_vx_vy(&mut self) {
             let sum: u16 = self.registers[self.get_vx() as usize] as u16 + self.registers[self.get_vy() as usize] as u16;
             self.registers[0xf] = if sum > 255 { 1 } else { 0 };
-            self.registers[self.get_vx() as usize] = (sum & 0xff) as u8
+            self.registers[self.get_vx() as usize] = (sum & 0xff) as u8;
+            self.pc += 2;
         }
 
         // 0x8xy5 - Subtract register y from register x, set register F to 1 if register x > register y
         fn sub_vx_vy(&mut self) {
             self.registers[0xf] = if self.registers[self.get_vx() as usize] > self.registers[self.get_vy() as usize] { 1 } else { 0 };
-            self.registers[self.get_vx() as usize] -= self.registers[self.get_vy() as usize]
+            self.registers[self.get_vx() as usize] -= self.registers[self.get_vy() as usize];
+            self.pc += 2;
         }
 
         // 0x8xy6 - Set register f to lsb and shift register x right 1
         fn shr_vx_vy(&mut self) {
             self.registers[0xf] = self.registers[self.get_vx() as usize] & 0x1;
             self.registers[self.get_vx() as usize] >>= 1;
+            self.pc += 2;
         }
 
         // 0x8xy7 - subtract Vx from Vy and store in Vx, if Vy > Vx then Vf = 1
         fn subn_vx_vy(&mut self) {
             self.registers[0xf] = if self.registers[self.get_vy() as usize] > self.registers[self.get_vx() as usize] { 1 } else { 0 };
-            self.registers[self.get_vx() as usize] = self.registers[self.get_vy() as usize] - self.registers[self.get_vx() as usize]
+            self.registers[self.get_vx() as usize] = self.registers[self.get_vy() as usize] - self.registers[self.get_vx() as usize];
+            self.pc += 2;
         }
 
         // 0x8xy8 - Set register f to msb and shift register x left 1
         fn shl_vx_vy(&mut self) {
             self.registers[0xf] = (self.registers[self.get_vx() as usize] & 0x80) >> 7;
             self.registers[self.get_vx() as usize] <<= 1;
+            self.pc += 2;
         }
 
 
@@ -168,11 +184,14 @@ pub mod cpu {
             if self.registers[self.get_vx() as usize] != self.registers[self.get_vy() as usize] {
                 self.pc += 2;
             }
+            self.pc += 2;
         }
 
         // 0xAnnn - Index is set to nnn
         fn ld_i_addr(&mut self) {
             self.index = self.get_u16();
+            self.pc += 2;
+
         }
 
         // 0xBnnn - PC is set to V0 + nnn
@@ -183,16 +202,20 @@ pub mod cpu {
 
         // 0xCxkk - Generate random byte, AND with kk, and then store in Vx
         fn rnd_vx_byte(&mut self) {
-            self.registers[self.get_vx() as usize] = rand::random::<u8>() & self.get_u8()
+            self.registers[self.get_vx() as usize] = rand::random::<u8>() & self.get_u8();
+            self.pc += 2;
         }
 
-        fn drw_vx_vy_nibble(&mut self) {}
+        fn drw_vx_vy_nibble(&mut self) {
+            self.pc += 2;
+        }
 
         // 0xEx9E - skip if key is pressed
         fn skp_vx(&mut self) {
             if self.keypad[self.get_vx() as usize] {
                 self.pc += 2
             }
+            self.pc += 2;
         }
 
         // 0xExA1 - skip if key is not pressed
@@ -200,43 +223,53 @@ pub mod cpu {
             if !self.keypad[self.get_vx() as usize] {
                 self.pc += 2
             }
+            self.pc += 2;
         }
 
         // 0xFx07 - load delay into register vx
         fn ld_vx_dt(&mut self) {
-            self.registers[self.get_vx() as usize] = self.delay
+            self.registers[self.get_vx() as usize] = self.delay;
+            self.pc += 2;
         }
 
         fn ld_vx_k(&mut self) {
-            unimplemented!()
+            unimplemented!();
+            self.pc += 2;
         }
 
         fn ld_dt_vx(&mut self) {
-            unimplemented!()
+            unimplemented!();
+            self.pc += 2;
         }
 
         fn ld_st_vx(&mut self) {
-            unimplemented!()
+            unimplemented!();
+            self.pc += 2;
         }
 
         fn add_i_vx(&mut self) {
-            unimplemented!()
+            unimplemented!();
+            self.pc += 2;
         }
 
         fn ld_f_vx(&mut self) {
-            unimplemented!()
+            unimplemented!();
+            self.pc += 2;
         }
 
         fn ld_b_vx(&mut self) {
-            unimplemented!()
+            unimplemented!();
+            self.pc += 2;
         }
 
         fn ld_mem_vx(&mut self) {
-            unimplemented!()
+            unimplemented!();
+            self.pc += 2;
         }
 
         fn ld_vx_mem(&mut self) {
-            unimplemented!()
+            unimplemented!();
+            self.pc += 2;
         }
     }
 }
