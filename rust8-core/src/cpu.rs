@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pub mod cpu {
-    use crate::state::{*};
+    use crate::emu::{*};
     use crate::constants::{FONTSET_START, DISPLAY_HEIGHT, DISPLAY_WIDTH};
 
     pub trait CPU {
@@ -54,7 +54,7 @@ pub mod cpu {
         fn ld_vx_mem(&mut self);
     }
 
-    impl CPU for State {
+    impl CPU for Emulator {
         /// 0x00E0 - Clear the display
         fn cls(&mut self) {
             self.vram = [false; 64 * 32];
@@ -211,12 +211,12 @@ pub mod cpu {
             let mut loc_x = self.get_x();
             let mut loc_y = self.get_y();
             for byte in 0..self.get_n() {
-                let y = (self.registers[self.get_y()] + byte) % DISPLAY_HEIGHT;
+                let y = (self.registers[self.get_y() as usize] + byte) % DISPLAY_HEIGHT;
                 for bit in 0..8u8 {
-                    let x = (self.registers[self.get_x()] + bit) % DISPLAY_WIDTH;
+                    let x = (self.registers[self.get_x() as usize] + bit) % DISPLAY_WIDTH;
                     let value = (self.memory[self.index as usize + byte as usize] >> (7 - bit)) & 1;
-                    self.registers[0xf] |= value & self.memory[y * DISPLAY_HEIGHT + x];
-                    self.memory[y * DISPLAY_HEIGHT + x] ^= value;
+                    self.registers[0xf] |= value & self.memory[y as usize * DISPLAY_HEIGHT as usize + x as usize];
+                    self.memory[y as usize * DISPLAY_HEIGHT as usize + x as usize] ^= value;
                 }
             }
             self.vram_dirty = true;

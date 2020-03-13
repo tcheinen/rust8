@@ -18,7 +18,7 @@ use crate::cpu::cpu::CPU;
 use crate::keyboard::Keyboard;
 
 
-pub struct State {
+pub struct Emulator {
     pub registers: [u8; 16],
     pub memory: [u8; 4096],
     pub index: u16,
@@ -33,7 +33,7 @@ pub struct State {
     pub keyboard: Keyboard
 }
 
-impl State {
+impl Emulator {
     pub fn tick(&mut self) {
         let instruction: u16 = ((self.memory[self.pc as usize] as u16) << 8) | self.memory[(self.pc + 1) as usize] as u16;
         let lower_4: u8 = (instruction & 0xff) as u8;
@@ -127,11 +127,19 @@ impl State {
     pub fn get_y(&self) -> u8 {
         ((self.opcode & 0x00F0) >> 4) as u8
     }
+
+    pub fn load_rom(&mut self, rom: Vec<u8>) {
+        let mut index = 0x200;
+        for byte in rom {
+            self.memory[index] = byte;
+            index += 1;
+        }
+    }
 }
 
-impl Default for State {
-    fn default() -> State {
-        let mut state = State {
+impl Default for Emulator {
+    fn default() -> Emulator {
+        let mut state = Emulator {
             registers: [0x0; 16],
             memory: [0x0; 4096],
             index: 0,
