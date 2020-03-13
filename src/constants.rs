@@ -33,4 +33,4 @@ pub const FONTSET: [u8; 5 * 16] = [
     0xF0, 0x80, 0xF0, 0x80, 0x80        // F
 ];
 
-pub const FONTSET_START: u16 = 0x50;
+pub const FONTSET_START: usize = 0x50;

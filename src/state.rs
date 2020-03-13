@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::constants;
-use crate::cpu::CPU;
+use crate::cpu::cpu::CPU;
 
 pub struct State {
     pub registers: [u8; 16],
@@ -33,7 +33,7 @@ pub struct State {
 
 impl State {
     pub fn tick(&mut self) {
-        let instruction: u16 = (self.memory[pc] << 8) | self.memory[pc + 1];
+        let instruction: u16 = ((self.memory[self.pc as usize] as u16) << 8) | self.memory[(self.pc + 1) as usize] as u16;
         let lower_4: u8 = (instruction & 0xff) as u8;
         let lower_8: u8 = (instruction & 0xff) as u8;
         let lower_8: u8 = (instruction & 0xff) as u8;
@@ -103,8 +103,9 @@ impl State {
 
     // Read u16 from memory and increment PC twice
     pub fn read_cycle(&mut self) -> u16 {
-        opcode: u16 = self.memory[pc] | self.memory[pc + 1];
-        opcode
+        let opcode: u16 = self.memory[self.pc as usize] as u16 | self.memory[(self.pc + 1) as usize] as u16;
+        self.pc += 2;
+        return opcode
     }
 
     // return short value for an operation
@@ -144,8 +145,8 @@ impl Default for State {
             opcode: 0,
         };
         for i in 0..constants::FONTSET.len() {
-            state.memory[constants::FONTSET_START + i as u16] = constants::FONTSET[i];
+            state.memory[constants::FONTSET_START + i] = constants::FONTSET[i];
         }
-        state;
+        state
     }
 }
