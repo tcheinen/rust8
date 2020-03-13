@@ -29,28 +29,28 @@ pub struct Emulator {
     pub sound: u8,
     pub vram: [bool; 64 * 32],
     pub vram_dirty: bool,
-    pub opcode: u16,
+    pub instruction: u16,
     pub keyboard: Keyboard,
 }
 
 impl Emulator {
     pub fn tick(&mut self) {
-        let instruction: u16 = ((self.memory[self.pc as usize] as u16) << 8) | self.memory[(self.pc + 1) as usize] as u16;
-        let lower_4: u8 = (instruction & 0xff) as u8;
-        let lower_8: u8 = (instruction & 0xff) as u8;
-        let lower_8: u8 = (instruction & 0xff) as u8;
+        self.instruction = ((self.memory[self.pc as usize] as u16) << 8) | self.memory[(self.pc + 1) as usize] as u16;
+        let lower_4: u8 = (self.instruction & 0xff) as u8;
+        let lower_8: u8 = (self.instruction & 0xff) as u8;
+        let lower_8: u8 = (self.instruction & 0xff) as u8;
 
-        let x: u8 = ((instruction >> 8) & 0xf0) as u8;
-        let n: u8 = (instruction & 0x000f) as u8;
-        let nn: u8 = (instruction & 0x00ff) as u8;
+        let x: u8 = ((self.instruction >> 8) & 0xf0) as u8;
+        let n: u8 = (self.instruction & 0x000f) as u8;
+        let nn: u8 = (self.instruction & 0x00ff) as u8;
 
-        println!("{:#x} - {}", instruction, mnemonic(instruction));
-        match instruction >> 12 {
+        println!("{:#x} - {}", self.instruction, mnemonic(self.instruction));
+        match self.instruction >> 12 {
             0x0 => {
                 match nn {
                     0xE0 => { self.cls() }
                     0xEE => { self.ret() }
-                    _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", instruction, self.pc) }
+                    _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", self.instruction, self.pc) }
                 }
             }
             0x1 => { self.jp_addr() }
@@ -71,7 +71,7 @@ impl Emulator {
                     0x6 => { self.shr_vx_vy() }
                     0x7 => { self.subn_vx_vy() }
                     0x8 => { self.shl_vx_vy() }
-                    _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", instruction, self.pc) }
+                    _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", self.instruction, self.pc) }
                 }
             }
             0x9 => { self.sne_vx_vy() }
@@ -83,7 +83,7 @@ impl Emulator {
                 match nn {
                     0x9e => { self.skp_vx() }
                     0xA1 => { self.sknp_vx() }
-                    _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", instruction, self.pc) }
+                    _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", self.instruction, self.pc) }
                 }
             }
             0xF => {
@@ -97,36 +97,36 @@ impl Emulator {
                     0x33 => { self.ld_b_vx() }
                     0x55 => { self.ld_mem_vx() }
                     0x65 => { self.ld_vx_mem() }
-                    _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", instruction, self.pc) }
+                    _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", self.instruction, self.pc) }
                 }
             }
-            _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", instruction, self.pc) }
+            _ => { panic!("Invalid Opcode {:#X} at PC {:#x}", self.instruction, self.pc) }
         }
     }
 
     // return lower 12 bits of an opcode
     pub fn get_nnn(&self) -> u16 {
-        self.opcode & 0x0FFF
+        self.instruction & 0x0FFF
     }
 
     /// return lower byte of opcode
     pub fn get_nn(&self) -> u8 {
-        (self.opcode & 0xFF) as u8
+        (self.instruction & 0xFF) as u8
     }
 
     /// return lower four bits of opcode
     pub fn get_n(&self) -> u8 {
-        (self.opcode & 0x000F) as u8
+        (self.instruction & 0x000F) as u8
     }
 
     /// return second most significant 4 bits 0x00
     pub fn get_x(&self) -> u8 {
-        ((self.opcode & 0x0F00) >> 8) as u8
+        ((self.instruction & 0x0F00) >> 8) as u8
     }
 
     /// return third most significant 4 bits 00y0
     pub fn get_y(&self) -> u8 {
-        ((self.opcode & 0x00F0) >> 4) as u8
+        ((self.instruction & 0x00F0) >> 4) as u8
     }
 
     pub fn load_rom(&mut self, rom: Vec<u8>) {
@@ -151,7 +151,7 @@ impl Default for Emulator {
             sound: 0,
             vram: [false; 64 * 32],
             vram_dirty: false,
-            opcode: 0,
+            instruction: 0,
             keyboard: Keyboard::default(),
         };
         for i in 0..constants::FONTSET.len() {

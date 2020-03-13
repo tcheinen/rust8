@@ -70,7 +70,8 @@ pub mod cpu {
 
         /// 0x1nnn - Jump to location nnn
         fn jp_addr(&mut self) {
-            self.pc = self.get_nnn();
+            let nnn = self.get_nnn();
+            self.pc = nnn;
         }
 
         /// 0x2nnn - Call function at nnn
@@ -216,7 +217,7 @@ pub mod cpu {
                     let x = (self.registers[self.get_x() as usize] + bit) % DISPLAY_WIDTH;
                     let value = (self.memory[self.index as usize + byte as usize] >> (7 - bit)) & 1;
                     self.registers[0xf] |= value & self.memory[y as usize * DISPLAY_HEIGHT as usize + x as usize];
-                    self.memory[y as usize * DISPLAY_HEIGHT as usize + x as usize] ^= value;
+                    self.vram[y as usize * DISPLAY_HEIGHT as usize + x as usize] ^= value != 0;
                 }
             }
             self.vram_dirty = true;
