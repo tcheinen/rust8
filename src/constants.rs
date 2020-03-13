@@ -1,4 +1,3 @@
-// Rust8
 // Copyright (C) 2019 Teddy Heinen
 //
 // This program is free software: you can redistribute it and/or modify
@@ -33,4 +32,8 @@ pub const FONTSET: [u8; 5 * 16] = [
     0xF0, 0x80, 0xF0, 0x80, 0x80        // F
 ];
 
-pub const FONTSET_START: usize = 0x50;
+pub const FONTSET_START: u16 = 0x50;
+
+pub const DISPLAY_WIDTH: u8 = 64;
+
+pub const DISPLAY_HEIGHT: u8 = 32;

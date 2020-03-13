@@ -1,4 +1,3 @@
-// Rust8
 // Copyright (C) 2019 Teddy Heinen
 //
 // This program is free software: you can redistribute it and/or modify
@@ -29,6 +28,7 @@ pub struct State {
     pub delay: u8,
     pub sound: u8,
     pub vram: [bool; 64 * 32],
+    pub vram_dirty: bool,
     pub opcode: u16,
     pub keyboard: Keyboard
 }
@@ -120,6 +120,11 @@ impl State {
         (self.opcode & 0xFF) as u8
     }
 
+    /// return lower four bits of opcode
+    pub fn get_n(&self) -> u8 {
+        (self.opcode & 0x000F) as u8
+    }
+
     // return left register for an operation
     pub fn get_vx(&self) -> u8 {
         ((self.opcode & 0x0F00) >> 8) as u8
@@ -143,11 +148,12 @@ impl Default for State {
             delay: 0,
             sound: 0,
             vram: [false; 64 * 32],
+            vram_dirty: false,
             opcode: 0,
             keyboard: Keyboard::default()
         };
         for i in 0..constants::FONTSET.len() {
-            state.memory[constants::FONTSET_START + i] = constants::FONTSET[i];
+            state.memory[constants::FONTSET_START as usize + i] = constants::FONTSET[i];
         }
         state
     }
