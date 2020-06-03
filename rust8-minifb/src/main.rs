@@ -1,11 +1,10 @@
 use rust8_core::emu::Emulator;
 use minifb::{Window, WindowOptions, Key, KeyRepeat};
 use rust8_core::constants::DISPLAY_WIDTH;
-use std::thread;
 
 fn main() {
     let rom: Vec<u8> = include_bytes!("../../roms/maze.ch8").to_vec();
-    let mut emu: Emulator = Emulator::default();
+    let mut emu: Emulator = Emulator::new();
     emu.load_rom(rom);
 
     let width = 640;

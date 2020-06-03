@@ -13,6 +13,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#![forbid(unsafe_code)]
+#![deny(
+// missing_debug_implementations,
+// missing_docs,
+trivial_casts,
+trivial_numeric_casts,
+unused_extern_crates,
+unused_import_braces,
+unused_qualifications,
+unused_results,
+warnings
+)]
+
+
 pub mod emu;
 pub mod constants;
 mod cpu;

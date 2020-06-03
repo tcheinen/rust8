@@ -1,6 +1,7 @@
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 
+
 pub struct Display {
     sender: Sender<[bool; 64 * 32]>,
     receiver: Receiver<[bool; 64 * 32]>,
@@ -16,13 +17,11 @@ impl Display {
     }
 
     pub fn update_display(&mut self) {
-        self.sender.send(self.vram);
+        self.sender.send(self.vram).expect("the send didnt work, idk when it would fail but i need to add error handing to this");
         self.dirty = true;
     }
-}
 
-impl Default for Display {
-    fn default() -> Self {
+    pub fn new() -> Self {
         let(_sender, _receiver): (Sender<[bool; 64 * 32]>, Receiver<[bool; 64 * 32]>) = mpsc::channel();
         return Display {
             sender: _sender,
@@ -31,4 +30,5 @@ impl Default for Display {
             dirty: false,
         }
     }
+
 }

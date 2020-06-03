@@ -14,10 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::constants;
-use crate::cpu::cpu::{CPU, mnemonic};
+use crate::cpu::{CPU, mnemonic};
 use crate::keyboard::Keyboard;
 use crate::display::Display;
-
 
 pub struct Emulator {
     pub registers: [u8; 16],
@@ -36,11 +35,7 @@ pub struct Emulator {
 impl Emulator {
     pub fn tick(&mut self) {
         self.instruction = ((self.memory[self.pc as usize] as u16) << 8) | self.memory[(self.pc + 1) as usize] as u16;
-        let lower_4: u8 = (self.instruction & 0xff) as u8;
-        let lower_8: u8 = (self.instruction & 0xff) as u8;
-        let lower_8: u8 = (self.instruction & 0xff) as u8;
 
-        let x: u8 = ((self.instruction >> 8) & 0xf0) as u8;
         let n: u8 = (self.instruction & 0x000f) as u8;
         let nn: u8 = (self.instruction & 0x00ff) as u8;
 
@@ -134,10 +129,8 @@ impl Emulator {
             index += 1;
         }
     }
-}
 
-impl Default for Emulator {
-    fn default() -> Emulator {
+    pub fn new() -> Self {
         let mut state = Emulator {
             registers: [0x0; 16],
             memory: [0x0; 4096],
@@ -147,9 +140,9 @@ impl Default for Emulator {
             stack: [0x0; 16],
             delay: 0,
             sound: 0,
-            display: Display::default(),
+            display: Display::new(),
             instruction: 0,
-            keyboard: Keyboard::default(),
+            keyboard: Keyboard::new(),
         };
         for i in 0..constants::FONTSET.len() {
             state.memory[constants::FONTSET_START as usize + i] = constants::FONTSET[i];
